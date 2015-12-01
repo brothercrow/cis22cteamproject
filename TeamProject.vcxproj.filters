@@ -32,9 +32,6 @@
     <ClInclude Include="GraphInterface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Kruskal.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="LinkedGraph.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -48,6 +45,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Vertex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Prim.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
