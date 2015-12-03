@@ -3,10 +3,11 @@
 #include <iomanip>
 #include <fstream>
 #include <vector>
-#include "LinkedGraph.h"
 #include "Vertex.h"
 #include "Edge.h"
+#include "LinkedGraph.h"
 
+using namespace std;
 // By C. Lee-Klawender
 
 template <class LabelType>
@@ -54,20 +55,28 @@ public:
     ~Prim(){}
     void displayMenu();
     void createMinSpanTree();
+    void readGraph();
+    void writeGraph();
+    void addEdge();
+    void removeEdge();
+    void undoRemove();
+    void displayGraphDepth();
+    void displayGraphBreadth();
     void writeMinSpanTree(ostream &os);
     void writeStartingEdges(ostream &os); // for debugging
+    template<class LabelType> 
     bool add(LabelType start, LabelType end, int edgeWeight = 0)
     {
 	   if (LinkedGraph<LabelType>::add(start, end, edgeWeight))
 	   {
 		  Edge<LabelType> edge(end, edgeWeight);
 		  PrimEdge<LabelType> newEdge(start, edge);
-		  StartingEdges.push_back(newEdge);
+		  startingEdges.push_back(newEdge);
 		  return true;
 	   }
 	   return false;
     }
-
+    template<class LabelType>
     bool remove(LabelType start, LabelType end)
     {
 	   vector<PrimEdge<LabelType>>::iterator iterElem;
@@ -84,7 +93,11 @@ public:
     }
 };
 
-void Prim<class LabelType>::displayMenu()
+
+
+
+template<class LabelType>
+void Prim<LabelType>::displayMenu()
 {
     int choice = 0;
     bool valid = true;
@@ -159,10 +172,10 @@ void Prim<LabelType>::writeMinSpanTree(ostream &os)
 template <class LabelType>
 void Prim<LabelType>::writeStartingEdges(ostream &os)
 {
-    writeVector(os, StartingEdges);
+    writeVector(os, startingEdges);
 }
 // private functions:
-
+/*
 template <class LabelType>
 void Prim<LabelType>::applyPrim()
 {
@@ -186,7 +199,7 @@ void Prim<LabelType>::applyPrim()
 
 	   startVertex = vertices.getItem(start); // get start Vertex from graph
 	   endVertex = vertices.getItem(end); // get end Vertex from graph
-	   if (/* REMOVED */)
+	   if (// REMOVED //)
 	   {
 		  // NOT SHOWN
 
@@ -207,14 +220,17 @@ bool  Prim<LabelType>::notConnected(LabelType &end1, LabelType &end2)
     }
     return true;
 }
-
+*/
 template <class LabelType>
 void Prim<LabelType>::writeVector(ostream &os, vector<PrimEdge<LabelType>> &vect)
 {
     int size = vect.size();
+    os << "vector size is " << size << " edges." << endl; //<-------------------------------------------------remove
     for (int i = 0; i < size; ++i){
 	   PrimEdge<LabelType> edge = vect[i];
 	   os << "From " << edge.getStart() << " to " << edge.getEnd()
 		  << " with weight = " << edge.getWeight() << endl;
     }
 }
+
+

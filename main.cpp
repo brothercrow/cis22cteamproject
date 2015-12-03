@@ -3,8 +3,8 @@
 
 #include <iostream>
 #include <string>
-#include "LinkedGraph.h"
 #include "Prim.h"
+
 
 using namespace std;
 
@@ -13,7 +13,7 @@ void display(string& anItem)
    cout << "Displaying item - " << anItem << endl;
 }
 
-void graphTest(LinkedGraph<string>* testGraph)
+void graphTest(Prim<string>* testGraph)
 {
    string A("A");
    string B("B");
@@ -30,23 +30,24 @@ void graphTest(LinkedGraph<string>* testGraph)
    string M("M");
    string N("N");
    
-   testGraph->add(A, B, 0);
-   testGraph->add(A, C, 0);
-   testGraph->add(A, D, 0);
-   testGraph->add(B, E, 0);
-   testGraph->add(B, F, 0);
-   testGraph->add(C, G, 0);
-   testGraph->add(D, H, 0);
-   testGraph->add(D, I, 0);
-   testGraph->add(F, J, 0);   
-   testGraph->add(G, K, 0);
-   testGraph->add(G, L, 0);   
-   testGraph->add(H, M, 0);
-   testGraph->add(I, M, 0);
-   testGraph->add(I, N, 0);
+   testGraph->add(A, B, 2);
+   testGraph->add(A, C, 4);
+   testGraph->add(A, D, 1);
+   testGraph->add(B, E, 5);
+   testGraph->add(B, F, 3);
+   testGraph->add(C, G, 4);
+   testGraph->add(D, H, 1);
+   testGraph->add(D, I, 2);
+   testGraph->add(F, J, 5);   
+   testGraph->add(G, K, 3);
+   testGraph->add(G, L, 2);   
+   testGraph->add(H, M, 1);
+   testGraph->add(I, M, 4);
+   testGraph->add(I, N, 2);
    
    cout << "Vertices :" << testGraph->getNumVertices() << endl;
    cout << "Edges :" << testGraph->getNumEdges() << endl;
+   
   
    cout << "\nDepth-first traversal (should be A B E F J C G K L D H M I N):" << endl;
    testGraph->depthFirstTraversal(A, display);
@@ -57,11 +58,13 @@ void graphTest(LinkedGraph<string>* testGraph)
 
 int main()
 {
-   LinkedGraph<string>* myGraph = new LinkedGraph<string>();
- 
+   Prim<string>* myGraph = new Prim<string>();
+
    cout << "Testing Graph . . . ." << endl << endl ;
    graphTest(myGraph);
-   
+   myGraph->writeStartingEdges(cout);
+
+   system("pause");
    return 0;
 }  // end main
 
