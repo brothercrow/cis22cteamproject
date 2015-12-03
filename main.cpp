@@ -63,6 +63,7 @@ int main()
    cout << "Testing Graph . . . ." << endl << endl ;
    graphTest(myGraph);
    myGraph->writeStartingEdges(cout);
+   //myGraph->displayMenu();
 
    system("pause");
    return 0;

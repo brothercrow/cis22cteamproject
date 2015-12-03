@@ -25,9 +25,8 @@ public:
 	bool push(const ItemType& newItem);
 	bool pop();
 	ItemType peek() const {return topPtr->getItem();}
+	int size() const { return count; }
 };
-
-/////////////// add to this class so it's not an abstract class
 
 template<class ItemType>
 LinkedStack<ItemType>::LinkedStack(const LinkedStack<ItemType>& aStack)
@@ -53,6 +52,7 @@ LinkedStack<ItemType>::LinkedStack(const LinkedStack<ItemType>& aStack)
          newChainPtr = newChainPtr->getNext();						// walk to next item
          origChainPtr = origChainPtr->getNext();
       }
+
       newChainPtr->setNext(0);						// set end of list
    }
 }

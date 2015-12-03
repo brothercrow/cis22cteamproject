@@ -6,8 +6,10 @@
 #include "Vertex.h"
 #include "Edge.h"
 #include "LinkedGraph.h"
+#include "LinkedStack.h"
 
 using namespace std;
+
 // By C. Lee-Klawender
 
 template <class LabelType>
@@ -21,6 +23,7 @@ class Prim : public LinkedGraph<LabelType>
 	   LabelType startLabel;
 	   Edge<LabelType> edge;
 	   bool checked;
+
 
     public:
 	   PrimEdge(){}
@@ -45,6 +48,7 @@ class Prim : public LinkedGraph<LabelType>
 private:
     vector<PrimEdge<LabelType>> minSpanTree;
     vector<PrimEdge<LabelType>> startingEdges;
+    LinkedStack<PrimEdge<LabelType>> removedEdges;
 
     void applyPrim();
     bool notConnected(LabelType &end1, LabelType &end2);
@@ -57,14 +61,13 @@ public:
     void createMinSpanTree();
     void readGraph();
     void writeGraph();
-    void addEdge();
-    void removeEdge();
-    void undoRemove();
+    bool addEdge();
+    bool removeEdge();
+    bool undoRemove();
     void displayGraphDepth();
     void displayGraphBreadth();
     void writeMinSpanTree(ostream &os);
     void writeStartingEdges(ostream &os); // for debugging
-    template<class LabelType> 
     bool add(LabelType start, LabelType end, int edgeWeight = 0)
     {
 	   if (LinkedGraph<LabelType>::add(start, end, edgeWeight))
@@ -76,7 +79,6 @@ public:
 	   }
 	   return false;
     }
-    template<class LabelType>
     bool remove(LabelType start, LabelType end)
     {
 	   vector<PrimEdge<LabelType>>::iterator iterElem;
@@ -105,47 +107,54 @@ void Prim<LabelType>::displayMenu()
     {
 	   system("CLS");
 	   cout << endl << endl << endl << endl;
-	   cout << setw(26) << "Prim Algorithm Demonstration" << endl;
-	   cout << setw(43) << "Main Menu" << endl << endl;
-	   cout << setw(27) << " " << "1.  Read Graph from file" << endl;
-	   cout << setw(27) << " " << "2.  add an edge to Graph" << endl;
-	   cout << setw(27) << " " << "3.  remove an edge from graph" << endl;
-	   cout << setw(27) << " " << "4.  undo removal(s)" << endl << endl;
-	   cout << setw(27) << " " << "5.  display Graph with Depth-First traversal" << endl << endl;
-	   cout << setw(27) << " " << "6.  display Graph with Breadth-First traversal" << endl << endl;
-	   cout << setw(27) << " " << "7.  create minimum spanning tree" << endl << endl;
-	   cout << setw(27) << " " << "8.  write Graph to file" << endl << endl;
-	   cout << setw(27) << " " << "9.  Exit" << endl << endl;
-	   cout << setw(27) << " " << "Enter Your Choice: ";
+	   cout << setw(20) << " " << "Prim Algorithm Demonstration" << endl;
+	   cout << setw(40) << "Main Menu" << endl << endl;
+	   cout << setw(20) << " " << "1.  Read Graph from file" << endl << endl;
+	   cout << setw(20) << " " << "2.  add an edge to Graph" << endl << endl;
+	   cout << setw(20) << " " << "3.  remove an edge from graph" << endl << endl;
+	   cout << setw(20) << " " << "4.  undo removal(s)" << endl << endl;
+	   cout << setw(20) << " " << "5.  display Graph with Depth-First traversal" << endl << endl;
+	   cout << setw(20) << " " << "6.  display Graph with Breadth-First traversal" << endl << endl;
+	   cout << setw(20) << " " << "7.  create minimum spanning tree" << endl << endl;
+	   cout << setw(20) << " " << "8.  write Graph to file" << endl << endl;
+	   cout << setw(20) << " " << "9.  Exit" << endl << endl;
+	   cout << setw(20) << " " << "Enter Your Choice: ";
 	   cin >> choice;
 
 	   switch (choice)
 	   {
 	   case 1:
-		  readGraph();//Harshith
+		 // readGraph();//Harshith
 		  break;
 	   case 2:
-		  addEdge();//Trevor
+		  if(addEdge())//Trevor
+			 break;
+		  cout << "Could not add edge." << endl;
 		  break;
 	   case 3:
-		  removeEdge();//Trevor
+		  if(removeEdge())//Trevor
+			 break;
+		  cout << "Could not remove edge." << endl;
 		  break;
 	   case 4:
-		  undoRemove();//Trevor
+		  if(undoRemove())//Trevor
+			 break;
+		  cout << "Could not restore edge." << endl;
 		  break;
 	   case 5:
-		  displayGraphDepth();//Harshith
+		 // displayGraphDepth();//Harshith
 		  break;
 	   case 6:
-		  displayGraphBreadth();//Harshith
+		 // displayGraphBreadth();//Harshith
 		  break;
 	   case 7:
-		  createMinSpanTree();//Victor
+		 // createMinSpanTree();//Victor
 		  break;
 	   case 8:
-		  writeGraph();//Harshith
+		 // writeGraph();//Harshith
 		  break;
 	   case 9:
+		  cout << endl << "Exiting program!" << endl << endl;
 		  valid = false;
 		  break;
 	   default:
@@ -233,4 +242,114 @@ void Prim<LabelType>::writeVector(ostream &os, vector<PrimEdge<LabelType>> &vect
     }
 }
 
+template <class LabelType>
+bool Prim<LabelType>::addEdge(){
+    LabelType start, end;
+    int weight;
+    char choice;
 
+    //Input variables
+    system("CLS");
+    cout << "Enter start vertex: ";
+    cin >> start;
+    cout << "Enter end vertex: ";
+    cin >> end;
+    cout << "Enter 'Y' if you want to weight this edge, otherwise enter any other letter.";
+	   cin >> choice;
+
+    //In case user doesn't capitalize input
+    choice = toupper(choice);
+
+    //If user wants to weight edge, do so.  If not, the add function will default it to zero
+    if (choice == 'Y')
+    {
+	   cout << "Enter edge weight: ";
+	   cin >> weight;
+    }
+
+    //If edge is added successfully, let user know it was successful and return true
+    if (add(start, end, weight))
+    {
+	   cout << "Edge successfully added!" << endl;
+	   system("pause");
+	   return true;
+    }
+
+    //Return false if unsuccessful
+    return false;
+}
+
+template <class LabelType>
+bool Prim<LabelType>::removeEdge()
+{
+    LabelType start, end;
+    int weight;
+
+    //Input variables
+    system("CLS");
+    cout << "Enter start vertex: ";
+    cin >> start;
+    cout << "Enter end vertex: ";
+    cin >> end;
+
+    //Save the weight of the to be removed edge
+    vector<PrimEdge<LabelType>>::iterator iterElem;
+    for (iterElem = startingEdges.begin(); iterElem != startingEdges.end(); ++iterElem)
+    {
+	   LabelType end1 = iterElem->getStart();
+	   LabelType end2 = iterElem->getEnd();
+	   if (start == end1 && end == end2 || start == end2 && end == end1)
+	   {
+		  weight = iterElem->getWeight();
+		  break;
+	   }
+    }
+
+    //If edge is removed, let user know it was successful and push "removed edge" to stack. Then return true
+    if (remove(start, end))
+    {
+	   cout << "Edge removed successfully!" << endl;
+	   Edge<LabelType> ed(end, weight);
+	   PrimEdge<LabelType> removed(start, ed);
+	  
+		  if (removedEdges.push(removed)){
+		  cout << "Removal saved successfully!" << endl;
+		  }
+		  system("pause");
+	   return true;
+    }
+
+    //Return false if unsuccessful
+    return false;
+}
+
+template <class LabelType>
+bool Prim<LabelType>::undoRemove()
+{
+    PrimEdge<LabelType> top; //will be the edge that was last removed
+    LabelType start, end;
+    int weight;
+
+    //Save information from edge that was last removed in temp variables
+    top = removedEdges.peek();
+    start = top.getStart();
+    end = top.getEnd();
+    weight = top.getWeight();
+
+    removedEdges.pop(); //pop top of stack once information is saved in temp variables
+
+    //If successfully added, output success and info about added edge and return true
+    system("CLS");
+    if (add(start, end, weight))
+    {
+	   cout << "Undo removal of edge successful!" << endl;
+	   cout << "Edge start: " << start << endl;		//Feel free to remove these cout statements if you'd prefer
+	   cout << "Edge end: " << end << endl;
+	   cout << "Edge weight: " << weight << endl;
+	   system("pause");
+	   return true;
+    }
+
+    //Return false if unsuccessful
+    return false;
+}
