@@ -3,6 +3,7 @@
 #include <iomanip>
 #include <fstream>
 #include <vector>
+#include <string>
 #include "Vertex.h"
 #include "Edge.h"
 #include "LinkedGraph.h"
@@ -49,6 +50,7 @@ private:
     vector<PrimEdge<LabelType>> minSpanTree;
     vector<PrimEdge<LabelType>> startingEdges;
     LinkedStack<PrimEdge<LabelType>> removedEdges;
+    vector<LabelType> locVertices;
 
     void applyPrim();
     bool notConnected(LabelType &end1, LabelType &end2);
@@ -93,8 +95,17 @@ public:
 	   }
 	   return LinkedGraph<LabelType>::remove(start, end);
     }
+    //Harshiths Code
+    //template<class LabelType>
+    void display(LabelType& anItem)
+    {
+	   cout << "Displaying item - " << anItem << endl;
+    }
+    void getVertices(LabelType& anItem)
+    {
+	   locVertices.push_back(anItem);
+    }
 };
-
 
 
 
@@ -124,7 +135,7 @@ void Prim<LabelType>::displayMenu()
 	   switch (choice)
 	   {
 	   case 1:
-		 // readGraph();//Harshith
+		  readGraph();//Harshith
 		  break;
 	   case 2:
 		  if(addEdge())//Trevor
@@ -142,16 +153,16 @@ void Prim<LabelType>::displayMenu()
 		  cout << "Could not restore edge." << endl;
 		  break;
 	   case 5:
-		 // displayGraphDepth();//Harshith
+		  displayGraphDepth();//Harshith
 		  break;
 	   case 6:
-		 // displayGraphBreadth();//Harshith
+		  displayGraphBreadth();//Harshith
 		  break;
 	   case 7:
-		 // createMinSpanTree();//Victor
+		  createMinSpanTree();//Victor
 		  break;
 	   case 8:
-		 // writeGraph();//Harshith
+		  writeGraph();//Harshith
 		  break;
 	   case 9:
 		  cout << endl << "Exiting program!" << endl << endl;
@@ -165,6 +176,79 @@ void Prim<LabelType>::displayMenu()
 	   }
     }
 }
+
+//Harshiths Code
+/**********************************************************************************************************************/
+template <class LabelType>
+void Prim<LabelType>::readGraph()
+{
+    string filename;
+    ifstream ifs;
+    LabelType start;
+    LabelType end;
+    string edgeweightcon;
+    int edgeweight;
+    cout << "Enter the input filename: ";
+    getline(cin, filename);
+    ifs.open(filename.c_str());
+
+    //read stream line by line 
+    //if line
+    //concatanate the characters, seperate by start,end,edgeweight
+    //then send to  testGraph->add(B, F, 3);
+    if (ifs.is_open())
+    {
+	   while (getline(ifs, start, ','))
+	   {
+		  //getline(start, end, edgeweight);
+
+		  cout << "start " << start << " ";
+
+		  getline(ifs, end, ',');
+		  cout << "End: " << end << " ";
+
+		  getline(ifs, edgeweightcon, ',');
+		  edgeweight = std::stoi(edgeweightcon, nullptr, 0);
+		  cout << "edgeweight: " << edgeweight << " " << endl << endl;
+
+		  add(start, end, edgeweight);
+	   }
+	   ifs.close();
+    }
+
+}
+template <class LabelType>
+void Prim<LabelType>::displayGraphDepth()
+{
+    LabelType startLabel = "A";
+    cout << "\nDepth-first traversal (should be A B E F J C G K L D H M I N):" << endl;
+    //LinkedGraph<LabelType>::
+	//   depthFirstTraversal(startLabel, display);
+	   
+}
+
+template <class LabelType>
+void Prim<LabelType>::displayGraphBreadth()
+{
+    LabelType startLabel = "A";
+    cout << "\nBreadth-first traversal (should be A B C D E F G H I J K L M N):" << endl;
+    //LinkedGraph<LabelType>::
+    //breadthFirstTraversal(startLabel, display);
+}
+
+template <class LabelType>
+void Prim<LabelType>::writeGraph()
+{
+    ofstream myfile;
+    LabelType startLabel = "A";
+    myfile.open("output.txt");
+    //writeStartingEdges(myfile);
+    //traverseGraph(startLabel, myfile);
+    myfile.close();
+
+}
+
+/***********************************************************************************************************/
 
 template <class LabelType>
 void Prim<LabelType>::createMinSpanTree()
@@ -184,7 +268,6 @@ void Prim<LabelType>::writeStartingEdges(ostream &os)
     writeVector(os, startingEdges);
 }
 // private functions:
-/*
 template <class LabelType>
 void Prim<LabelType>::applyPrim()
 {
@@ -193,43 +276,55 @@ void Prim<LabelType>::applyPrim()
 	   minSpanTree.clear();
     }
     unvisitVertices(); // reset this graph
-    int numEdges = startingEdges.size();
-    int edgeCount = 0;
-    for (int i = 0; i < numEdges && edgeCount < numberOfVertices - 1; ++i)
+    /*
+    PrimEdge<LabelType>* curredge = &startingEdges[0];
+    Vertex<LabelType> startVertex = vertices.getItem(curredge->getStart());
+    Vertex<LabelType> minNeighbor;
+    startVertex.visit();
+
+
+
+    int k = 0;
+    int weight = 0;
+    int min = 600;
+    while (k < numberOfVertices)
     {
-	   for (int i = 0; i < minSpanTree.size(); ++i){ // reset for each edge
-		  minSpanTree[i].setChecked(false);
-	   }
-
-	   PrimEdge<LabelType> *currEdge = &startingEdges[i];
-	   LabelType start = currEdge->getStart(); // get name of start of edge
-	   LabelType end = currEdge->getEnd(); // get name of end of edge
-	   Vertex<LabelType>* startVertex = 0, *endVertex = 0;
-
-	   startVertex = vertices.getItem(start); // get start Vertex from graph
-	   endVertex = vertices.getItem(end); // get end Vertex from graph
-	   if (// REMOVED //)
+	   min = 600;
+	   for (int i = 0; i < numberOfVertices; i++)
 	   {
-		  // NOT SHOWN
+		  if (startVertex.isVisited())
+		  {
+			 startVertex.resetNeighbor();
+			 for (int j = 0; j < startVertex->getNumberOfNeighbors(); j++)
+			 {
+				Vertex<LabelType> neighbor = vertices.getItem(startVertex->getNextNeighbor());
+				weight = startVertex->getEdgeWeight(neighbor->getLabel());
+				if (weight < min)
+				{
+				    min = weight;
+				    minNeighbor = neighbor;
 
+				}
+			 }
+		  }
 	   }
+	   locVertices.push_back(startVertex->getLabel());
+	   locVertices.push_back(minNeighbor->getLabel());
+	   k++;
 
     }
+
+
+    */
+
+    system("CLS");
+    writeVector(cout, startingEdges);
+    //writeVector(cout, minSpanTree);
+
+    system("pause");
+    
 }
 
-// checks if end1 is already connected to end2 in the minimum spanning tree so far
-template <class LabelType>
-bool  Prim<LabelType>::notConnected(LabelType &end1, LabelType &end2)
-{
-    for (int i = 0; i < minSpanTree.size(); ++i)
-    {
-	   // THIS IS REALLY DIFFICULT, BUT NOT SHOWN BECAUSE YOU MAY HAVE
-	   //    SIMILAR ALGORITHMS THAT NEED THIS
-	   // ETC.
-    }
-    return true;
-}
-*/
 template <class LabelType>
 void Prim<LabelType>::writeVector(ostream &os, vector<PrimEdge<LabelType>> &vect)
 {

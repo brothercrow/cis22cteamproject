@@ -44,7 +44,7 @@ void graphTest(Prim<string>* testGraph)
    testGraph->add(H, M, 1);
    testGraph->add(I, M, 4);
    testGraph->add(I, N, 2);
-   
+   /*
    cout << "Vertices :" << testGraph->getNumVertices() << endl;
    cout << "Edges :" << testGraph->getNumEdges() << endl;
    
@@ -54,16 +54,17 @@ void graphTest(Prim<string>* testGraph)
   
    cout << "\nBreadth-first traversal (should be A B C D E F G H I J K L M N):" << endl;
    testGraph->breadthFirstTraversal(A, display);
+   */
 }  // end graphTest
 
 int main()
 {
    Prim<string>* myGraph = new Prim<string>();
 
-   cout << "Testing Graph . . . ." << endl << endl ;
+   //cout << "Testing Graph . . . ." << endl << endl ;
    graphTest(myGraph);
-   myGraph->writeStartingEdges(cout);
-   //myGraph->displayMenu();
+   //myGraph->writeStartingEdges(cout);
+   myGraph->displayMenu();
 
    system("pause");
    return 0;

@@ -57,7 +57,7 @@ public:
    int getEdgeWeight(LabelType start, LabelType end) const;
    void depthFirstTraversal(LabelType start, void visit(LabelType&));
    void breadthFirstTraversal(LabelType start, void visit(LabelType&));
-
+   void traverseGraph(LabelType startLabel, ofstream &ofs);
    //---> YOU DECLARE HERE (AND WRITE BELOW) THE MEMBER FUNCTION TO
    //         WRITE THE GRAPH TO A TEXT FILE (SUGGEST TO PASS AN
    //        ofstream TO THIS !
@@ -281,4 +281,47 @@ findOrCreateVertex(const LabelType& vertexLabel)
    //         WRITE THE GRAPH's vertices and its adjacency list
    //         TO A TEXT FILE (SUGGEST TO PASS AN
    //         ofstream TO THIS !
+
+template<class LabelType>
+void LinkedGraph<LabelType>::
+traverseGraph(LabelType startLabel ,ofstream &ofs)
+{
+    queue<Vertex<LabelType>*> vertexQueue;
+    Vertex<LabelType>* startVertex = vertices.getItem(startLabel);
+    //LabelType startLabel = startVertex->getLabel();
+    //   cout << "Enqueue and visit " << startLabel << endl;
+    vertexQueue.push(startVertex);
+    startVertex->visit();         // Mark as visited
+    visit(startLabel);
+    startVertex->resetNeighbor(); // Reset reference for adjacency list
+
+    while (!vertexQueue.empty())
+    {
+	   // Remove vertex from queue
+	   Vertex<LabelType>* nextVertex = vertexQueue.front();
+	   vertexQueue.pop();
+	   LabelType nextLabel = nextVertex->getLabel();
+	   //      cout << "Dequeue " << nextLabel << endl;
+	   //      cout << "Consider " << nextLabel << "'s " << nextVertex->getNumberOfNeighbors() << " neighbors." << endl;
+
+	   // Add neighbors of visited vertex to queue
+	   for (int index = 1; index <= nextVertex->getNumberOfNeighbors(); index++)
+	   {
+		  LabelType neighborLabel = nextVertex->getNextNeighbor();
+		  //         cout << "Neighbor " << neighborLabel;
+		  Vertex<LabelType>* neighbor = vertices.getItem(neighborLabel);
+		  if (!neighbor->isVisited())
+		  {
+			 //            cout << " is not visited; enqueue and visit it." << endl;
+			 vertexQueue.push(neighbor);
+			 neighbor->visit();         // Mark as visited
+			 visit(neighborLabel);
+			 neighbor->resetNeighbor(); // Reset reference for adjacency list
+		  }
+		  //         else
+		  //            cout << " was visited already; ignore it." << endl;
+	   }  // end for
+    }  // end while
+}  // end breadthFirstTraversalHelper
+
 #endif
