@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+
 #include "Vertex.h"
 #include "Edge.h"
 #include "LinkedGraph.h"
@@ -76,7 +77,7 @@ public:
 	   {
 		  Edge<LabelType> edge(end, edgeWeight);
 		  PrimEdge<LabelType> newEdge(start, edge);
-		  startingEdges.push_back(newEdge);
+		  startingEdges.push_back(newEdge);		  		 
 		  return true;
 	   }
 	   return false;
@@ -95,19 +96,44 @@ public:
 	   }
 	   return LinkedGraph<LabelType>::remove(start, end);
     }
-    //Harshiths Code
-    //template<class LabelType>
-    void display(LabelType& anItem)
-    {
-	   cout << "Displaying item - " << anItem << endl;
-    }
-    void getVertices(LabelType& anItem)
-    {
-	   locVertices.push_back(anItem);
-    }
+    void getVertices();
+    
 };
 
-
+template<class LabelType>
+void Prim<LabelType>::getVertices()
+{
+    if (locVertices.size() > 0)
+	   locVertices.clear();
+    PrimEdge<LabelType>* item;
+    bool startFound = false;
+    bool endFound = false;
+    for (int i = 0; i < numberOfVertices; i++)
+    {
+	   item = &startingEdges[i];
+	   for (int j = 0; j < locVertices.size(); j++)
+	   {
+		  if (locVertices[j] == item->getStart())
+		  {
+			 startFound = true;
+		  }
+		  if (locVertices[j] == item->getEnd())
+		  {
+			 endFound = true;
+		  }
+	   }
+	   if (!startFound)
+		  locVertices.push_back(item->getStart());
+	   if (!endFound)
+		  locVertices.push_back(item->getEnd());
+	   startFound = false;
+	   endFound = false;
+    }
+    system("CLS");
+    for (int i = 0; i < locVertices.size(); i++)
+	   cout << "vertex: " << locVertices[i] << endl;
+    system("pause");
+}
 
 template<class LabelType>
 void Prim<LabelType>::displayMenu()
@@ -138,19 +164,13 @@ void Prim<LabelType>::displayMenu()
 		  readGraph();//Harshith
 		  break;
 	   case 2:
-		  if(addEdge())//Trevor
-			 break;
-		  cout << "Could not add edge." << endl;
+		  addEdge();    //Trevor
 		  break;
 	   case 3:
-		  if(removeEdge())//Trevor
-			 break;
-		  cout << "Could not remove edge." << endl;
+		  removeEdge(); //Trevor
 		  break;
 	   case 4:
-		  if(undoRemove())//Trevor
-			 break;
-		  cout << "Could not restore edge." << endl;
+		  undoRemove(); //Trevor
 		  break;
 	   case 5:
 		  displayGraphDepth();//Harshith
@@ -253,6 +273,7 @@ void Prim<LabelType>::writeGraph()
 template <class LabelType>
 void Prim<LabelType>::createMinSpanTree()
 {
+    getVertices();
     applyPrim();
 }
 
@@ -276,14 +297,12 @@ void Prim<LabelType>::applyPrim()
 	   minSpanTree.clear();
     }
     unvisitVertices(); // reset this graph
+
     /*
     PrimEdge<LabelType>* curredge = &startingEdges[0];
     Vertex<LabelType> startVertex = vertices.getItem(curredge->getStart());
     Vertex<LabelType> minNeighbor;
     startVertex.visit();
-
-
-
     int k = 0;
     int weight = 0;
     int min = 600;
@@ -303,7 +322,6 @@ void Prim<LabelType>::applyPrim()
 				{
 				    min = weight;
 				    minNeighbor = neighbor;
-
 				}
 			 }
 		  }
@@ -311,13 +329,12 @@ void Prim<LabelType>::applyPrim()
 	   locVertices.push_back(startVertex->getLabel());
 	   locVertices.push_back(minNeighbor->getLabel());
 	   k++;
-
     }
-
-
     */
-
     system("CLS");
+
+    
+
     writeVector(cout, startingEdges);
     //writeVector(cout, minSpanTree);
 
@@ -338,9 +355,10 @@ void Prim<LabelType>::writeVector(ostream &os, vector<PrimEdge<LabelType>> &vect
 }
 
 template <class LabelType>
-bool Prim<LabelType>::addEdge(){
+bool Prim<LabelType>::addEdge()
+{
     LabelType start, end;
-    int weight;
+    int weight = 0;
     char choice;
 
     //Input variables
@@ -350,27 +368,28 @@ bool Prim<LabelType>::addEdge(){
     cout << "Enter end vertex: ";
     cin >> end;
     cout << "Enter 'Y' if you want to weight this edge, otherwise enter any other letter.";
-	   cin >> choice;
+	cin >> choice;
 
     //In case user doesn't capitalize input
     choice = toupper(choice);
 
-    //If user wants to weight edge, do so.  If not, the add function will default it to zero
+    //If user wants to weight edge, do so.  If not, it's intialized to zero PLUS the add function would default it to zero even if not initialized
     if (choice == 'Y')
     {
-	   cout << "Enter edge weight: ";
-	   cin >> weight;
+	    cout << "Enter edge weight: ";
+	    cin >> weight;
     }
 
     //If edge is added successfully, let user know it was successful and return true
     if (add(start, end, weight))
     {
-	   cout << "Edge successfully added!" << endl;
-	   system("pause");
-	   return true;
+	    cout << "Edge successfully added!" << endl;
+	    system("pause");
+	    return true;
     }
 
-    //Return false if unsuccessful
+    //Output failure and return false if unsuccessful
+    cout << "Adding edge unsuccessful!" << endl;
     return false;
 }
 
@@ -387,34 +406,43 @@ bool Prim<LabelType>::removeEdge()
     cout << "Enter end vertex: ";
     cin >> end;
 
-    //Save the weight of the to be removed edge
+    //Save the weight of the to be removed edge - since remove() doesn't give weight of removed item
     vector<PrimEdge<LabelType>>::iterator iterElem;
     for (iterElem = startingEdges.begin(); iterElem != startingEdges.end(); ++iterElem)
     {
-	   LabelType end1 = iterElem->getStart();
-	   LabelType end2 = iterElem->getEnd();
-	   if (start == end1 && end == end2 || start == end2 && end == end1)
-	   {
-		  weight = iterElem->getWeight();
-		  break;
-	   }
+	    LabelType end1 = iterElem->getStart();
+	    LabelType end2 = iterElem->getEnd();
+	    if (start == end1 && end == end2 || start == end2 && end == end1)
+	    {
+	 	    weight = iterElem->getWeight();
+		    break;
+	    }
     }
 
-    //If edge is removed, let user know it was successful and push "removed edge" to stack. Then return true
+    //If edge is removed and saved, let user know it was successful and push "removed edge" to stack. Then return true
     if (remove(start, end))
     {
-	   cout << "Edge removed successfully!" << endl;
-	   Edge<LabelType> ed(end, weight);
-	   PrimEdge<LabelType> removed(start, ed);
-	  
-		  if (removedEdges.push(removed)){
-		  cout << "Removal saved successfully!" << endl;
-		  }
-		  system("pause");
-	   return true;
+	    cout << "Edge removed successfully!" << endl;
+	    Edge<LabelType> ed(end, weight);
+	    PrimEdge<LabelType> removed(start, ed);
+
+		if (removedEdges.push(removed))
+		{
+		    cout << "Removal saved successfully!" << endl;
+		    system("pause");
+	    	return true;
+		}
+		else
+		{
+			//Output failure and return false if unsuccessful
+			cout << "Removal not saved!" << endl;
+			system("pause");
+	    	return false;
+		}	
     }
 
-    //Return false if unsuccessful
+    //Output failure and return false if unsuccessful
+    cout << "Removal of edge unsuccessful!" << endl;
     return false;
 }
 
@@ -426,25 +454,27 @@ bool Prim<LabelType>::undoRemove()
     int weight;
 
     //Save information from edge that was last removed in temp variables
-    top = removedEdges.peek();
-    start = top.getStart();
-    end = top.getEnd();
+    top    = removedEdges.peek();
+    start  = top.getStart();
+    end    = top.getEnd();
     weight = top.getWeight();
 
-    removedEdges.pop(); //pop top of stack once information is saved in temp variables
+    //pop top of stack once information is saved in temp variables
+    removedEdges.pop(); 
 
     //If successfully added, output success and info about added edge and return true
     system("CLS");
     if (add(start, end, weight))
     {
-	   cout << "Undo removal of edge successful!" << endl;
-	   cout << "Edge start: " << start << endl;		//Feel free to remove these cout statements if you'd prefer
-	   cout << "Edge end: " << end << endl;
-	   cout << "Edge weight: " << weight << endl;
-	   system("pause");
-	   return true;
+	    cout << "Undo removal of edge successful!" << endl;
+	    cout << "Edge start: "  << start  << endl;		
+	    cout << "Edge end: "    << end    << endl;
+	    cout << "Edge weight: " << weight << endl;
+	    system("pause");
+	    return true;
     }
 
-    //Return false if unsuccessful
+    //Output failure and return false if unsuccessful
+    cout << "Undo removal of edge unsuccessful!" << endl;
     return false;
 }
