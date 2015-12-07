@@ -65,8 +65,8 @@ int main()
 
    //cout << "Testing Graph . . . ." << endl << endl ;
    graphTest(myGraph);
-   cout << "graph filled" << endl;
-   system("pause");
+   //cout << "graph filled" << endl;
+   //system("pause");
    //myGraph->writeStartingEdges(cout);
    myGraph->displayMenu();
 

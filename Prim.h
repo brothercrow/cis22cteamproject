@@ -129,10 +129,11 @@ void Prim<LabelType>::getVertices()
 	   startFound = false;
 	   endFound = false;
     }
-    system("CLS");
-    for (int i = 0; i < locVertices.size(); i++)
-	   cout << "vertex: " << locVertices[i] << endl;
-    system("pause");
+   // system("CLS");
+    //cout << "displaying vector of vertices." << endl;
+    //for (int i = 0; i < locVertices.size(); i++)
+	 //  cout << "vertex: " << locVertices[i] << endl;
+    //system("pause");
 }
 
 template<class LabelType>
@@ -297,46 +298,71 @@ void Prim<LabelType>::applyPrim()
 	   minSpanTree.clear();
     }
     unvisitVertices(); // reset this graph
+    system("CLS");
 
-    /*
-    PrimEdge<LabelType>* curredge = &startingEdges[0];
-    Vertex<LabelType> startVertex = vertices.getItem(curredge->getStart());
-    Vertex<LabelType> minNeighbor;
-    startVertex.visit();
-    int k = 0;
+   //int  size = numberOfVertices;
+    //int minWeight[14]; 
+    //int infin = 1000;
+    //PrimEdge<LabelType> newEdge;
+    Vertex<LabelType>* start = 0;
+    Vertex<LabelType>* minNeighbor = 0;
+    Vertex<LabelType>* neighbor = 0;
+    Edge<LabelType>* ed;
+    int minWeight = 1000;
     int weight = 0;
-    int min = 600;
-    while (k < numberOfVertices)
+    vector<LabelType> minSpanLabels;
+    start = vertices.getItem(locVertices[0]);
+    start->visit();
+    minSpanLabels.push_back(start->getLabel());
+    while (minSpanLabels.size() < numberOfVertices)
     {
-	   min = 600;
-	   for (int i = 0; i < numberOfVertices; i++)
+	   for (int j = 0; j < numberOfVertices;j++)
 	   {
-		  if (startVertex.isVisited())
+		  
+		 
+		  minWeight = 1000;
+		  for (int i = 0; i < numberOfVertices; i++)
 		  {
-			 startVertex.resetNeighbor();
-			 for (int j = 0; j < startVertex->getNumberOfNeighbors(); j++)
+			 weight = start->getEdgeWeight(locVertices[i]);
+			 if (weight > 0 && weight < minWeight)
 			 {
-				Vertex<LabelType> neighbor = vertices.getItem(startVertex->getNextNeighbor());
-				weight = startVertex->getEdgeWeight(neighbor->getLabel());
-				if (weight < min)
+				neighbor = vertices.getItem(locVertices[i]);
+				if (!neighbor->isVisited())
 				{
-				    min = weight;
+				    minWeight = weight;
 				    minNeighbor = neighbor;
+				    //cout << "insideloop add label nieghbor"<<neighbor->getLabel() << endl;
+				    //cout << "insideloop add label minNeighbor" << minNeighbor->getLabel() << endl;
+
 				}
 			 }
 		  }
+		  if (!minNeighbor->isVisited())
+		  {
+			 minSpanLabels.push_back(minNeighbor->getLabel());
+			 minNeighbor->visit();
+		  }
+		  if (minWeight != 1000)
+		  {
+			 Edge<LabelType> edge(minNeighbor->getLabel(), minWeight);
+			 PrimEdge<LabelType> newEdge(start->getLabel(), edge);
+			 minSpanTree.push_back(newEdge);
+		  }
+		  start = vertices.getItem(locVertices[j]);
 	   }
-	   locVertices.push_back(startVertex->getLabel());
-	   locVertices.push_back(minNeighbor->getLabel());
-	   k++;
+	   
+	 
+
     }
-    */
-    system("CLS");
+    
+    
 
     
 
-    writeVector(cout, startingEdges);
-    //writeVector(cout, minSpanTree);
+    //writeVector(cout, startingEdges);
+    //for (int i = 0; i < minSpanLabels.size(); i++)
+	 //  cout << "min span vertices:" << minSpanLabels[i] << endl;
+    writeVector(cout, minSpanTree);
 
     system("pause");
     
