@@ -52,6 +52,8 @@ private:
     vector<PrimEdge<LabelType>> startingEdges;
     LinkedStack<PrimEdge<LabelType>> removedEdges;
     vector<LabelType> locVertices;
+    void (*visit)(LabelType& anItem);
+    
 
     void applyPrim();
     bool notConnected(LabelType &end1, LabelType &end2);
@@ -59,6 +61,7 @@ private:
 
 public:
     Prim(){}
+    Prim(void (*display)(LabelType& anItem)){ visit = display; }
     ~Prim(){}
     void displayMenu();
     void createMinSpanTree();
@@ -203,14 +206,29 @@ void Prim<LabelType>::displayMenu()
 template <class LabelType>
 void Prim<LabelType>::readGraph()
 {
+    PrimEdge<LabelType> toDelete;
+    while (startingEdges.size() > 0)
+    {
+	   toDelete = startingEdges[0];
+	   //cout << "removing " << toDelete.getStart() << " to " << toDelete.getEnd() << endl;
+	   remove(toDelete.getStart(), toDelete.getEnd());
+    }
+    system("pause");
+    if (minSpanTree.size() > 0)
+	   {
+	   minSpanTree.clear();
+	   locVertices.clear();
+	   }
     string filename;
     ifstream ifs;
     LabelType start;
     LabelType end;
     string edgeweightcon;
     int edgeweight;
+    system("CLS");
     cout << "Enter the input filename: ";
-    getline(cin, filename);
+    cin >> filename;
+    //getline(cin, filename);
     ifs.open(filename.c_str());
 
     //read stream line by line 
@@ -222,39 +240,47 @@ void Prim<LabelType>::readGraph()
 	   while (getline(ifs, start, ','))
 	   {
 		  //getline(start, end, edgeweight);
-
+		  ifs.get();
 		  cout << "start " << start << " ";
 
 		  getline(ifs, end, ',');
+		  ifs.get();
 		  cout << "End: " << end << " ";
 
 		  getline(ifs, edgeweightcon, ',');
 		  edgeweight = std::stoi(edgeweightcon, nullptr, 0);
+		  ifs.get();
 		  cout << "edgeweight: " << edgeweight << " " << endl << endl;
 
 		  add(start, end, edgeweight);
 	   }
 	   ifs.close();
     }
+    system("pause");
 
 }
 template <class LabelType>
 void Prim<LabelType>::displayGraphDepth()
 {
-    LabelType startLabel = "A";
-    cout << "\nDepth-first traversal (should be A B E F J C G K L D H M I N):" << endl;
-    //LinkedGraph<LabelType>::
-	//   depthFirstTraversal(startLabel, display);
-	   
+    PrimEdge<LabelType> start = startingEdges[0];
+    LabelType startLabel = start.getStart();
+    
+    system("CLS");
+    cout << "\nDepth-first traversal:" << endl;
+    depthFirstTraversal(startLabel, visit);
+    system("pause");
 }
 
 template <class LabelType>
 void Prim<LabelType>::displayGraphBreadth()
 {
-    LabelType startLabel = "A";
-    cout << "\nBreadth-first traversal (should be A B C D E F G H I J K L M N):" << endl;
-    //LinkedGraph<LabelType>::
-    //breadthFirstTraversal(startLabel, display);
+    PrimEdge<LabelType> start = startingEdges[0];
+    LabelType startLabel = start.getStart();
+    
+    system("CLS");
+    cout << "\nBreadth-first traversal:" << endl;
+    breadthFirstTraversal(startLabel, visit);
+    system("pause");
 }
 
 template <class LabelType>
@@ -362,6 +388,7 @@ void Prim<LabelType>::applyPrim()
     //writeVector(cout, startingEdges);
     //for (int i = 0; i < minSpanLabels.size(); i++)
 	 //  cout << "min span vertices:" << minSpanLabels[i] << endl;
+    cout << "Minimum Spanning Tree created using Prim's Algorithm:" << endl << endl;
     writeVector(cout, minSpanTree);
 
     system("pause");

@@ -61,7 +61,7 @@ void graphTest(Prim<string>* testGraph)
 
 int main()
 {
-   Prim<string>* myGraph = new Prim<string>();
+   Prim<string>* myGraph = new Prim<string>(display);
 
    //cout << "Testing Graph . . . ." << endl << endl ;
    graphTest(myGraph);
